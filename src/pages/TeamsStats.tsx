@@ -3,8 +3,7 @@ import Content from '../components/Content'
 import Navbar from '../components/Navbar'
 import api from '../api'
 import SelectField from '../components/SelectField'
-import BarChart from '../components/BarChart'
-import DonutChart from '../components/DonutChart'
+import ChartsGroup from '../components/ChartsGroup'
 
 type Stats = {
   games: number,
@@ -197,6 +196,24 @@ const TeamsStats = () => {
     setAwayTeam('')
   }
 
+  const renderContent = () => {
+    if(!stats) {
+      return (
+        <></>
+      )
+    } else if(stats.games == 0){
+      return (
+        <div className='text-white'>
+          <p>Nenhum jogo encontrado para os filtros selecionados!</p>
+        </div>
+      )
+    } else {
+      return (
+        <ChartsGroup stats={stats}/>
+      )
+    }
+  }
+
   useEffect(() => {
     getHomeManagers()
     getAwayManagers()
@@ -224,7 +241,7 @@ const TeamsStats = () => {
                 selectedValue={homeManager}
                 onValueChange={handleHomeManagerChange}
                 displayProperty='homeManager'
-                wantedProperty='name'
+                wantedProperty='homeManager'
               />
               <SelectField
                 options={awayTeams}
@@ -239,7 +256,7 @@ const TeamsStats = () => {
                 labelText='Treinador Visitante'
                 selectedValue={awayManager}
                 onValueChange={handleAwayManagerChange}
-                wantedProperty='name'
+                wantedProperty='awayManager'
                 displayProperty='awayManager'
               />
               <div className='flex flex-col gap-5 items-end'>
@@ -258,135 +275,7 @@ const TeamsStats = () => {
               </div>
             </div>
             <div className='flex gap-5 flex-wrap'>
-              {stats &&
-                <>
-                  <BarChart
-                    categories={['Vitórias Local', 'Empates', 'Vitórias Visitantes']}
-                    series={[{
-                      name: '',
-                      data: [
-                        { x: '', y: stats.homeTeamWins },
-                        { x: '', y: stats.draws },
-                        { x: '', y: stats.awayTeamWins }
-                      ]
-                    }]}
-                    horizontal={false}
-                    max={undefined}
-                    title='Total Resultados'
-                  />
-                  <DonutChart
-                    series={[
-                      { label: 'Vitórias Local', value: stats.homeTeamWinPercentage, fairOdd: stats.fairOdds.homeTeamWins},
-                      { label: 'Empates', value: stats.drawsPercentage, fairOdd: stats.fairOdds.draws },
-                      { label: 'Vitórias Visitantes', value: stats.awayTeamWinPercentage, fairOdd: stats.fairOdds.awayTeamWins}
-                    ]}
-                    title='Resultados Percentual'
-                  />
-                  <DonutChart
-                    series={[
-                      {label: 'Sim', value: stats.bothScoredPercentual, fairOdd: stats.fairOdds.bothScored },
-                      {label: 'Não', value: stats.notBothScoredPercentual, fairOdd: stats.fairOdds.notBothScored }
-                    ]}
-                    title='Ambos Marcam'
-                  />
-                  <BarChart
-                    categories={['Mandante ou Empate', 'Empate ou Visitante', 'Mandante ou Visitante']}
-                    series={[
-                      {
-                        name: '',
-                        data: [
-                          { x: '', y: stats.homeOrDrawsPercentage, fairOdd: stats.fairOdds.homeOrDraws},
-                          { x: '', y: stats.awayOrDrawsPercentage, fairOdd: stats.fairOdds.awayOrDraws },
-                          { x: '', y: stats.homeOrAwayWinPercentage, fairOdd: stats.fairOdds.homeOrAwayWins },
-                        ]
-                      },
-                    ]}
-                    horizontal={true}
-                    max={undefined}
-                    title='Chance Dupla'
-                  />
-                  <BarChart
-                    categories={['Pelo menos 1 gol', 'Pelo menos 2 gols', 'Pelo menos 3 gols', 'Pelo menos 4 gols', 'Pelo menos 5 gols']}
-                    series={[
-                      {
-                        name: '',
-                        data: [
-                          { x: '', y: stats.homeTeamGoalsOverPercentage.atLeast1, fairOdd: stats.fairOdds.homeTeamGoalsOver.atLeast1 },
-                          { x: '', y: stats.homeTeamGoalsOverPercentage.atLeast2, fairOdd: stats.fairOdds.homeTeamGoalsOver.atLeast2 },
-                          { x: '', y: stats.homeTeamGoalsOverPercentage.atLeast3, fairOdd: stats.fairOdds.homeTeamGoalsOver.atLeast3 },
-                          { x: '', y: stats.homeTeamGoalsOverPercentage.atLeast4, fairOdd: stats.fairOdds.homeTeamGoalsOver.atLeast4 },
-                          { x: '', y: stats.homeTeamGoalsOverPercentage.atLeast5, fairOdd: stats.fairOdds.homeTeamGoalsOver.atLeast5 },
-                        ]
-                      },
-                    ]}
-                    horizontal={true}
-                    max={undefined}
-                    title='Gols Mandante'
-                  />
-                  <BarChart
-                    categories={['Pelo menos 1 gol', 'Pelo menos 2 gols', 'Pelo menos 3 gols', 'Pelo menos 4 gols', 'Pelo menos 5 gols']}
-                    series={[
-                      {
-                        name: '',
-                        data: [
-                          { x: '', y: stats.awayTeamGoalsOverPercentage.atLeast1, fairOdd: stats.fairOdds.awayTeamGoalsOver.atLeast1 },
-                          { x: '', y: stats.awayTeamGoalsOverPercentage.atLeast2, fairOdd: stats.fairOdds.awayTeamGoalsOver.atLeast2 },
-                          { x: '', y: stats.awayTeamGoalsOverPercentage.atLeast3, fairOdd: stats.fairOdds.awayTeamGoalsOver.atLeast3 },
-                          { x: '', y: stats.awayTeamGoalsOverPercentage.atLeast4, fairOdd: stats.fairOdds.awayTeamGoalsOver.atLeast4 },
-                          { x: '', y: stats.awayTeamGoalsOverPercentage.atLeast5, fairOdd: stats.fairOdds.awayTeamGoalsOver.atLeast5 },
-                        ]
-                      },
-                    ]}
-                    horizontal={true}
-                    max={undefined}
-                    title='Gols Visitante'
-                  />
-                  <BarChart
-                    categories={['Pelo menos 1 gol', 'Pelo menos 2 gols', 'Pelo menos 3 gols', 'Pelo menos 4 gols', 'Pelo menos 5 gols']}
-                    series={[
-                      {
-                        name: '',
-                        data: [
-                          { x: '', y: stats.gameTotalOverPercentage.atLeast1, fairOdd: stats.fairOdds.gameTotalOver.atLeast1 },
-                          { x: '', y: stats.gameTotalOverPercentage.atLeast2, fairOdd: stats.fairOdds.gameTotalOver.atLeast2 },
-                          { x: '', y: stats.gameTotalOverPercentage.atLeast3, fairOdd: stats.fairOdds.gameTotalOver.atLeast3 },
-                          { x: '', y: stats.gameTotalOverPercentage.atLeast4, fairOdd: stats.fairOdds.gameTotalOver.atLeast4 },
-                          { x: '', y: stats.gameTotalOverPercentage.atLeast5, fairOdd: stats.fairOdds.gameTotalOver.atLeast5 },
-                        ]
-                      },
-                    ]}
-                    horizontal={true}
-                    max={undefined}
-                    title='Total Gols'
-                  />
-                  <BarChart
-                    categories={[
-                      'Média de Gols Mandante',
-                      'Média de Gols Visitante',
-                      'Mínimo de Gols Mandante',
-                      'Mínimo de Gols Visitante',
-                      'Máximo de Gols Mandante',
-                      'Máximo de Gols Visitante',
-                    ]}
-                    series={[
-                      {
-                        name: '',
-                        data: [
-                          { x: '', y: stats.homeTeamGoalsAverage },
-                          { x: '', y: stats.awayTeamGoalsAverage },
-                          { x: '', y: stats.homeTeamMinGoals },
-                          { x: '', y: stats.awayTeamMinGoals },
-                          { x: '', y: stats.homeTeamMaxGoals },
-                          { x: '', y: stats.awayTeamMaxGoals },
-                        ]
-                      },
-                    ]}
-                    horizontal={true}
-                    max={undefined}
-                    title='Gols'
-                  />
-                </>
-              }
+              {renderContent()}
             </div>
           </div>
         </>

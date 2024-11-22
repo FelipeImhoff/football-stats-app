@@ -32,7 +32,7 @@ function SelectField({ options, labelText, selectedValue, onValueChange, display
         className='rounded p-1'
         options={options}
         getOptionLabel={(option) => option[displayProperty] || ""}
-        value={options.find(option => option[displayProperty] === selectedValue) || null}
+        value={options.find(option => option[wantedProperty] === selectedValue) || null}
         onChange={handleChange}
         renderInput={(params) => (
           <TextField
